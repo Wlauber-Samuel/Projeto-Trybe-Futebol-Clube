@@ -7,49 +7,48 @@ export default class MatchController {
     private matchService = new MatchService(),
   ) { }
 
-  public async getAll(req: Request, res: Response) {
-    const { inProgress } = req.query;
-    if (!inProgress) {
-      const serviceResponse = await this.matchService.getAll();
+  public async filterMatches(req: Request, res: Response) {
+    const filter = req.query.inProgress;
+
+    if (filter) {
+      const serviceResponse = await this.matchService.filterMatches(filter === 'true');
       return res.status(200).json(serviceResponse.data);
     }
-    const param = inProgress ? inProgress === 'true' : false;
-    const serviceResponse = await this.matchService.getInProgress(param);
-    return res.status(200).json(serviceResponse.data);
+
+    const serviceResponse = await this.matchService.findAll();
+    res.status(200).json(serviceResponse.data);
   }
 
-  public async getById(req: Request, res: Response) {
-    const { id } = req.params;
-    const serviceResponse = await this.matchService.getById(Number(id));
+  public async finishMatch(req: Request, res: Response): Promise<Response> {
+    const id = Number(req.params.id);
+    const serviceResponse = await this.matchService.finishMatch(id);
+
     if (serviceResponse.status !== 'SUCCESSFUL') {
       return res.status(mapStatusHTTP(serviceResponse.status)).json(serviceResponse.data);
     }
+
     return res.status(200).json(serviceResponse.data);
   }
 
-  public async finish(req: Request, res: Response) {
-    const { id } = req.params;
-    const serviceResponse = await this.matchService.finish(Number(id));
-    if (serviceResponse.status !== 'SUCCESSFUL') {
-      return res.status(mapStatusHTTP(serviceResponse.status)).json(serviceResponse.data);
-    }
-    return res.status(200).json({ message: 'Finished' });
-  }
-
-  public async update(req: Request, res: Response) {
-    const { id } = req.params;
+  public async update(req: Request, res: Response): Promise<Response> {
+    const id = Number(req.params.id);
     const { homeTeamGoals, awayTeamGoals } = req.body;
-    const serviceResponse = await this.matchService
-      .update(Number(id), Number(homeTeamGoals), Number(awayTeamGoals));
+    const serviceResponse = await this.matchService.update(id, homeTeamGoals, awayTeamGoals);
+
     if (serviceResponse.status !== 'SUCCESSFUL') {
       return res.status(mapStatusHTTP(serviceResponse.status)).json(serviceResponse.data);
     }
+
     return res.status(200).json(serviceResponse.data);
   }
 
   public async create(req: Request, res: Response) {
     const data = req.body;
-    const serviceResponse = await this.matchService.create(data);
+    const serviceResponse = await this.matchService.create({ ...data, inProgress: true });
+
+    if (serviceResponse.status !== 'SUCCESSFUL') {
+      return res.status(mapStatusHTTP(serviceResponse.status)).json(serviceResponse.data);
+    }
     return res.status(201).json(serviceResponse.data);
   }
 }

@@ -5,8 +5,9 @@ import {
   InferCreationAttributes,
   CreationOptional,
 } from 'sequelize';
-import SequelizeTeam from './TeamModel';
 import db from '.';
+import SequelizeTeam from './SequelizeTeam';
+// import OtherModel from './OtherModel';
 
 class SequelizeMatch extends Model<InferAttributes<SequelizeMatch>,
 InferCreationAttributes<SequelizeMatch>> {
@@ -22,17 +23,12 @@ SequelizeMatch.init({
   id: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    primaryKey: true,
     autoIncrement: true,
+    primaryKey: true,
   },
   homeTeamId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    field: 'home_team_id',
-    references: {
-      model: 'teams',
-      key: 'id',
-    },
   },
   homeTeamGoals: {
     type: DataTypes.INTEGER,
@@ -41,11 +37,6 @@ SequelizeMatch.init({
   awayTeamId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    field: 'away_team_id',
-    references: {
-      model: 'teams',
-      key: 'id',
-    },
   },
   awayTeamGoals: {
     type: DataTypes.INTEGER,
@@ -62,24 +53,18 @@ SequelizeMatch.init({
   underscored: true,
 });
 
-SequelizeTeam.hasMany(SequelizeMatch, {
-  foreignKey: 'home_team_id',
-  as: 'homeTeam',
-});
+SequelizeMatch.belongsTo(SequelizeTeam, { foreignKey: 'awayTeamId', as: 'awayTeam' });
+SequelizeMatch.belongsTo(SequelizeTeam, { foreignKey: 'homeTeamId', as: 'homeTeam' });
 
-SequelizeMatch.belongsTo(SequelizeTeam, {
-  foreignKey: 'home_team_id',
-  as: 'homeTeam',
-});
+/**
+    * `Workaround` para aplicar as associations em TS:
+    * Associations 1:N devem ficar em uma das instâncias de modelo
+    * */
 
-SequelizeTeam.hasMany(SequelizeMatch, {
-  foreignKey: 'away_team_id',
-  as: 'awayTeam',
-});
+// OtherModel.belongsTo(Example, { foreignKey: 'campoA', as: 'campoEstrangeiroA' });
+// OtherModel.belongsTo(Example, { foreignKey: 'campoB', as: 'campoEstrangeiroB' });
 
-SequelizeMatch.belongsTo(SequelizeTeam, {
-  foreignKey: 'away_team_id',
-  as: 'awayTeam',
-});
+// Example.hasMany(OtherModel, { foreignKey: 'campoC', as: 'campoEstrangeiroC' });
+// Example.hasMany(OtherModel, { foreignKey: 'campoD', as: 'campoEstrangeiroD' });
 
 export default SequelizeMatch;
