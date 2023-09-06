@@ -1,11 +1,11 @@
-import SequelizeMatch from '../database/models/SequelizeMatch';
-import SequelizeTeam from '../database/models/SequelizeTeam';
+import SequelizeMatch from '../database/models/MatchModel';
+import SequelizeTeam from '../database/models/TeamModel';
 import LeaderboardUtils from '../utils/leaderboardUtils';
 import HomeLeaderboardUtils from '../utils/homeLeaderboardUtils';
 import AwayLeaderboardUtils from '../utils/awayLeaderBoardUtils';
 import { ILeaderboard } from '../Interfaces/Leaderboard/ILeaderboard';
-import { ITeam } from '../Interfaces/Teams/ITeams';
-import { IMatch } from '../Interfaces/Matches/IMatches';
+import { ITeam } from '../Interfaces/Teams/ITeam';
+import { IMatch } from '../Interfaces/Matches/IMatch';
 
 export default class LeaderboardModel {
   private matchModel = SequelizeMatch;

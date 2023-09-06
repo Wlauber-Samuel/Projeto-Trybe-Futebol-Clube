@@ -1,68 +1,36 @@
-// import * as sinon from 'sinon';
-// import * as chai from 'chai';
+import * as chai from 'chai';
+// @ts-ignore
+import chaiHttp = require('chai-http');
 
-// // @ts-ignore
-// import chaiHttp = require('chai-http');
+import { app } from '../app';
 
-// import { App } from '../app';
-// import SequelizeMatch from '../database/models/SequelizeMatch';
-// import SequelizeTeam from '../database/models/SequelizeTeam';
-// import { allLeaderboardMock } from './mocks/Matches.mock';
+chai.use(chaiHttp);
 
-// import { Response } from 'superagent';
-// import MatchModel from '../models/MatchModel';
+const { expect } = chai;
 
-// chai.use(chaiHttp);
+describe('/leaderboard', function() {
 
-// const { app } = new App();
-// const { expect } = chai;
-
-// describe('Leaderboard test', () => {
-
-//   afterEach(sinon.restore);
-
-//   describe('GET /leaderboard', () => {
-//     it('should return a sorted leaderboard of all teams', async () => {
-//       // Arrange
-//       const buildTest = SequelizeMatch.bulkBuild()
-//       sinon.stub(SequelizeMatch, 'findAll').resolves(allLeaderboardMock as any);
-
-//       // Act
-//       const { status, body }  = await chai.request(app).get('/leaderboard');
-
-//       // Assert
-//       expect(status).to.equal(200);
-//       expect(body).to.deep.equal(allLeaderboardMock);
-//     });
-
-
-//   });
-
-// //   describe('GET /leaderboard/home', () => {
-// //     it('should return a sorted leaderboard of home teams', async () => {
-// //       // Arrange
-// //       sinon.stub(leaderboardService, 'findAllHome').resolves(matchesMock as any);
-
-// //       // Act
-// //       const response = await chai.request(app).get('/leaderboard/home');
-
-// //       // Assert
-// //       expect(response.status).to.equal(200);
-// //       expect(response.body).to.deep.equal(matchesMock);
-// //     });
-// //   });
-
-// //   describe('GET /leaderboard/away', () => {
-// //     it('should return a sorted leaderboard of away teams', async () => {
-// //       // Arrange
-// //       sinon.stub(leaderboardService, 'findAllAway').resolves(trueMatchesMock as any);
-
-// //       // Act
-// //       const response = await chai.request(app).get('/leaderboard/away');
-
-// //       // Assert
-// //       expect(response.status).to.equal(200);
-// //       expect(response.body).to.deep.equal(trueMatchesMock);
-// //     });
-// //   });
-// });
+  describe('/', function() {
+    it('should return general leaderboard', async function() {
+      const { status, body } = await chai.request(app).get('/leaderboard');
+  
+      expect(status).to.equal(200);
+    });
+  });
+  
+  describe('/home', function() {
+    it('should return home leaderboard', async function() {
+      const { status, body } = await chai.request(app).get('/leaderboard/home');
+  
+      expect(status).to.equal(200);
+    });
+  });
+  
+  describe('/away', function() {
+    it('should return away leaderboard', async function() {  
+      const { status, body } = await chai.request(app).get('/leaderboard/away');
+  
+      expect(status).to.equal(200);
+    });
+  });
+})

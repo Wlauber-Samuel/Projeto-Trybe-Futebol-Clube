@@ -1,9 +1,9 @@
 import { Model, QueryInterface, DataTypes } from 'sequelize';
-import IUsers from '../../Interfaces/users/IUsers';
+import { IUser } from '../../Interfaces/Users/IUser';
 
 export default {
   up(queryInterface: QueryInterface) {
-    return queryInterface.createTable<Model<IUsers>>('users', {
+    return queryInterface.createTable<Model<IUser>>('users', {
       id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -28,6 +28,7 @@ export default {
       },
     });
   },
+
   down(queryInterface: QueryInterface) {
     return queryInterface.dropTable('users');
   },

@@ -1,26 +1,14 @@
-import SequelizeMatch from '../database/models/SequelizeMatch';
-import SequelizeTeam from '../database/models/SequelizeTeam';
-import IMatches from '../Interfaces/matches/IMatches';
-import { IMatchModel } from '../Interfaces/matches/IMatchModel';
-import { NewEntity } from '../Interfaces/index';
+import SequelizeMatch from '../database/models/MatchModel';
+import SequelizeTeam from '../database/models/TeamModel';
+import { IMatch } from '../Interfaces/Matches/IMatch';
+import { IMatchModel } from '../Interfaces/Matches/IMatchModel';
 
 export default class MatchModel implements IMatchModel {
   private model = SequelizeMatch;
 
-  async findAll(): Promise<IMatches[]> {
+  async findAll(): Promise<IMatch[]> {
     const dbData = await this.model.findAll({
-      include: [
-        { model: SequelizeTeam, as: 'homeTeam', attributes: { exclude: ['id'] } },
-        { model: SequelizeTeam, as: 'awayTeam', attributes: { exclude: ['id'] } },
-      ],
-    });
-
-    return dbData;
-  }
-
-  async filterMatches(filter: boolean): Promise<IMatches[]> {
-    const dbData = await this.model.findAll({
-      where: { inProgress: filter },
+      attributes: { exclude: ['home_team_id', 'away_team_id'] },
       include: [
         { model: SequelizeTeam, as: 'homeTeam', attributes: { exclude: ['id'] } },
         { model: SequelizeTeam, as: 'awayTeam', attributes: { exclude: ['id'] } },
@@ -29,44 +17,55 @@ export default class MatchModel implements IMatchModel {
     return dbData;
   }
 
-  async findById(id: IMatches['id']): Promise<IMatches | null> {
-    const dbData = await this.model.findByPk(id);
-    if (dbData == null) return null;
-
-    const { homeTeamId, homeTeamGoals, awayTeamId, awayTeamGoals, inProgress }: IMatches = dbData;
-    return { id, homeTeamId, homeTeamGoals, awayTeamId, awayTeamGoals, inProgress };
+  async findInProgress(inProgress: IMatch['inProgress']): Promise<IMatch[]> {
+    const dbData = await this.model.findAll({
+      where: { inProgress },
+      attributes: { exclude: ['home_team_id', 'away_team_id'] },
+      include: [
+        { model: SequelizeTeam, as: 'homeTeam', attributes: { exclude: ['id'] } },
+        { model: SequelizeTeam, as: 'awayTeam', attributes: { exclude: ['id'] } },
+      ],
+    });
+    return dbData;
   }
 
-  async finishMatch(id: IMatches['id'])
-    : Promise<IMatches | string> {
-    const [affectedRows] = await this.model.update(
-      { inProgress: false },
-      { where: { id },
-        returning: true,
-      },
-    );
-    if (affectedRows === 0) return 'Match has not been updated';
-
-    return 'Match has been updated';
+  async findById(id: IMatch['id']): Promise<IMatch | null> {
+    const dbData = await this.model.findByPk(id, {
+      attributes: { exclude: ['home_team_id', 'away_team_id'] },
+      include: [
+        { model: SequelizeTeam, as: 'homeTeam', attributes: { exclude: ['id'] } },
+        { model: SequelizeTeam, as: 'awayTeam', attributes: { exclude: ['id'] } },
+      ],
+    });
+    return !dbData ? null : dbData;
   }
 
-  async update(id: IMatches['id'], homeTeamGoals: number, awayTeamGoals: number)
-    : Promise<IMatches | string> {
-    const [affectedRows] = await this.model.update(
-      {
-        homeTeamGoals, awayTeamGoals },
-      { where: { id } },
-    );
-    if (affectedRows === 0) return 'Match has not been updated';
-
-    return 'Match has been updated';
+  async finish(id: IMatch['id']): Promise<IMatch | null> {
+    await this.model.update({
+      inProgress: false,
+    }, {
+      where: { id },
+    });
+    const dbData = await this.findById(id);
+    return dbData;
   }
 
-  async create(data: NewEntity<IMatches>): Promise<IMatches> {
-    const dbData = await this.model.create(data);
+  async update(
+    id: IMatch['id'],
+    homeTeamGoals: IMatch['homeTeamGoals'],
+    awayTeamGoals: IMatch['awayTeamGoals'],
+  ): Promise<IMatch | null> {
+    await this.model.update({
+      homeTeamGoals, awayTeamGoals,
+    }, {
+      where: { id },
+    });
+    const dbData = await this.findById(id);
+    return dbData;
+  }
 
-    const { id, homeTeamId, homeTeamGoals,
-      awayTeamId, awayTeamGoals, inProgress }: IMatches = dbData;
-    return { id, homeTeamId, homeTeamGoals, awayTeamId, awayTeamGoals, inProgress };
+  async create(data: IMatch): Promise<IMatch> {
+    const dbData = await this.model.create({ ...data, inProgress: true });
+    return dbData;
   }
 }

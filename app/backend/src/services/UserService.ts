@@ -1,28 +1,38 @@
-// import { NewEntity } from '../Interfaces/index';
-import { IUserModel } from '../Interfaces/users/IUserModel';
-import UserModel from '../models/UserModel';
-import { IUserResponse } from '../Interfaces/users/IUsers';
+import * as bcrypt from 'bcryptjs';
 import { ServiceResponse } from '../Interfaces/ServiceResponse';
+import { IUserModel } from '../Interfaces/Users/IUserModel';
+import { IUser } from '../Interfaces/Users/IUser';
+import UserModel from '../models/UserModel';
 
 export default class UserService {
   constructor(
     private userModel: IUserModel = new UserModel(),
   ) { }
 
-  public async findAll(): Promise<ServiceResponse<IUserResponse[]>> {
+  public async getAll(): Promise<ServiceResponse<IUser[]>> {
     const allUsers = await this.userModel.findAll();
     return { status: 'SUCCESSFUL', data: allUsers };
   }
 
-  public async findById(id: number): Promise<ServiceResponse<IUserResponse>> {
-    const user = await this.userModel.findByPk(id);
+  public async getById(id: number): Promise<ServiceResponse<IUser>> {
+    const user = await this.userModel.findById(id);
     if (!user) return { status: 'NOT_FOUND', data: { message: `User ${id} not found` } };
     return { status: 'SUCCESSFUL', data: user };
   }
 
-  public async findRole(id: number): Promise<ServiceResponse<string>> {
-    const role = await this.userModel.findRole(id);
-    if (!role) return { status: 'NOT_FOUND', data: { message: `User ${id} not found` } };
-    return { status: 'SUCCESSFUL', data: role };
+  public async getByEmail(email: string, password: string): Promise<ServiceResponse<IUser>> {
+    const user = await this.userModel.findByEmail(email);
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+      return { status: 'UNAUTHORIZED', data: { message: 'Invalid email or password' } };
+    }
+    return { status: 'SUCCESSFUL', data: user };
+  }
+
+  public async returnRole(email: string): Promise<ServiceResponse<IUser>> {
+    const user = await this.userModel.findByEmail(email);
+    if (!user) {
+      return { status: 'UNAUTHORIZED', data: { message: 'Invalid email or password' } };
+    }
+    return { status: 'SUCCESSFUL', data: user };
   }
 }

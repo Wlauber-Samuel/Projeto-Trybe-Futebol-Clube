@@ -1,7 +1,4 @@
-import IUsers, { IUserResponse } from './IUsers';
+import { ICRUDModelEmail } from '../ICRUDModel';
+import { IUser } from './IUser';
 
-export interface IUserModel {
-  findAll(): Promise<IUserResponse[]>,
-  findByPk(id: IUsers['id']): Promise<IUserResponse | null>
-  findRole(id: IUsers['id']): Promise<string | null>
-}
+export type IUserModel = ICRUDModelEmail<IUser>;
