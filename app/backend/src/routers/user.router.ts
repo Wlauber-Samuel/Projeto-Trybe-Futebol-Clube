@@ -8,7 +8,7 @@ const userController = new UserController();
 const router = Router();
 
 router.get('/', (req: Request, res: Response) => userController.getAll(req, res));
-
+// t
 router.get(
   '/role',
   TokenValidation.validateToken,
