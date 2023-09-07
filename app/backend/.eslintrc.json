@@ -93,11 +93,6 @@
     "sonarjs/no-useless-catch": ["error"],
     "sonarjs/prefer-object-literal": ["error"],
     "sonarjs/prefer-single-boolean-return": ["error"],
-    "sonarjs/no-inverted-boolean-check": ["error"],
-    "import/extensions": [
-      "error",
-      "ignorePackages",
-      { "js": "never", "jsx": "never", "ts": "never", "tsx": "never" }
-    ]
+    "sonarjs/no-inverted-boolean-check": ["error"]
   }
 }
