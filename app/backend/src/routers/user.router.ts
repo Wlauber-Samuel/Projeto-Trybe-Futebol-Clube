@@ -2,15 +2,13 @@ import { Request, Router, Response } from 'express';
 import TokenValidation from '../middlewares/ValidateToken';
 import LoginValidation from '../middlewares/ValidateLogin';
 import UserController from '../controllers/UserController';
-// user
-// testando
-// ultimo teste
+// consertando user.router.ts
 const userController = new UserController();
 
 const router = Router();
 
 router.get('/', (req: Request, res: Response) => userController.getAll(req, res));
-// t
+
 router.get(
   '/role',
   TokenValidation.validateToken,
