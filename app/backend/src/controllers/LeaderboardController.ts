@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
 import LeaderboardService from '../services/LeaderboardService';
-
+// commit
+// testando
+// testando 2
 export default class LeaderboardController {
-  constructor(
-    private leaderboardService = new LeaderboardService(),
-  ) { }
+  constructor(private leaderboardService = new LeaderboardService()) {}
 
   public async leaderboard(req: Request, res: Response) {
-    const serviceResponse = await this.leaderboardService.leaderboard('general');
+    const serviceResponse = await this.leaderboardService.leaderboard(
+      'general',
+    );
     return res.status(200).json(serviceResponse.data);
   }
 
