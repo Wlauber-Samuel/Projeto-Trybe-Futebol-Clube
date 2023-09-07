@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import UserService from '../services/UserService';
 import mapStatusHTTP from '../utils/mapStatusHTTP';
 import JWT from '../utils/JWT';
-
+// tentando consertar cache do git na usercontroller
 export default class UserController {
   constructor(
     private userService = new UserService(),
